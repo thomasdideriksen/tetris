@@ -5,16 +5,44 @@
     <head>
         <link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
         <meta charset="UTF-8">
-        <title>Tetris</title>
-        
-        <link rel="stylesheet" href="specimen_files/specimen_stylesheet.css" type="text/css" charset="utf-8" />
-        <link rel="stylesheet" href="stylesheet.css" type="text/css" charset="utf-8" />
+        <title>Tetris</title>      
         <style>
+            html {
+                height: 100%;
+            }
             body {
+                height: 100%;
+                margin: 0px;
                 background: #202020;
-                color: #2b9f2b;
-                font-family: 'v5_prophitcell';
-                font-size: 35px;
+                color: #808080;
+                font-family: Open Sans Condensed;
+                font-size: 30px;
+            }
+            #outerContainer {
+                height: 100%;
+                display: flex;
+                justify-content: center;
+                align-items: center;
+            }
+            #container {
+                position: relative;
+            }
+            #info {
+                position: absolute;
+                right: 0px;
+                top: 0px;
+                display:flex;
+                flex-flow: column nowrap;
+                justify-content: center;
+                width: 300px;
+                margin-right: -316px;
+            }
+            #tetris {
+                border: 1px solid #606060;
+                margin: 0px;
+                padding: 0px;
+                flex: 0 0 auto;
+                border-radius: 1px;
             }
         </style>
         <script>
@@ -66,13 +94,15 @@
                 this.top = 4;
                 this.cols = 10 + 2;
                 this.rows  = 16 + 1 + this.top;
-                this.dim = 20;
+                this.dim = 28;
                 this.margin = 4;
                 
                 // Game canvas
                 this.cvs = document.createElement('canvas');
                 this.cvs.width = this.cols * (this.dim + this.margin) - this.margin;
+                this.cvs.style.display = 'block';
                 this.cvs.height = (this.rows - this.top) * (this.dim + this.margin) - this.margin;
+                console.log(this.cvs.height);
                 this.ctx = this.cvs.getContext('2d');
                 domContainer.appendChild(this.cvs);
                 
@@ -388,7 +418,7 @@
                 
                     // Visualize
                     var ctx = this.ctx;
-                    ctx.fillStyle = 'black';
+                    ctx.fillStyle = '#101010';
                     ctx.fillRect(0, 0, this.cvs.width, this.cvs.height);
                     
                     ctx.save();
@@ -410,20 +440,20 @@
                                     y += (this.dim + this.margin) * (Math.pow(tickPercent, 5));
                                 } 
                                 var grd = ctx.createLinearGradient(0, y, 0, y + this.dim);
-                                grd.addColorStop(0, '#3fe93f');
-                                grd.addColorStop(1, '#35c335');
+                                grd.addColorStop(0, '#306aff');
+                                grd.addColorStop(1, '#234ebb');
                                 ctx.fillStyle = grd;
                                 break;
                             case 3:
                                 var grd = ctx.createLinearGradient(0, y, 0, y + this.dim);
-                                grd.addColorStop(0, '#2b9f2b');
-                                grd.addColorStop(1, '#1c661c');
+                                grd.addColorStop(0, '#66708a');
+                                grd.addColorStop(1, '#4c5467');
                                 ctx.fillStyle = grd; 
                                 break;                                
                             case 4: 
                                 var grd = ctx.createLinearGradient(0, y, 0, y + this.dim);
-                                grd.addColorStop(0, '#0c2e0c');
-                                grd.addColorStop(1, '#0f3a0f');
+                                grd.addColorStop(0, '#303030');
+                                grd.addColorStop(1, '#202020');
                                 ctx.fillStyle = grd; 
                                 break;
                             default: 
@@ -444,9 +474,15 @@
     </head>
     
     <body onload='init();'>
-        <div id='tetris'></div>
-        <div><span>SCORE </span><span id='score'></span></div>
-        <div><span>LEVEL </span><span id='level'></span></div>
+        <div id='outerContainer'>
+            <div id='container'>
+                <div id='tetris'></div>            
+                <div id='info'>
+                    <div><span>SCORE </span><span id='score'></span></div>
+                    <div><span>LEVEL </span><span id='level'></span></div>
+                </div>
+            </div>
+        </div>
     </body>
 
 </html>
