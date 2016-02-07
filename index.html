@@ -4,6 +4,7 @@
 
     <head>
         <link href='https://fonts.googleapis.com/css?family=Open+Sans+Condensed:300' rel='stylesheet' type='text/css'>
+        <link href='https://fonts.googleapis.com/css?family=Open+Sans:400,300,600,700' rel='stylesheet' type='text/css'>
         <meta charset="UTF-8">
         <title>Tetris</title>      
         <style>
@@ -25,17 +26,20 @@
                 align-items: center;
             }
             #container {
+                display: flex;
                 position: relative;
             }
             #info {
                 position: absolute;
-                right: 0px;
+                left: 16px;
                 top: 0px;
                 display:flex;
                 flex-flow: column nowrap;
                 justify-content: center;
-                width: 300px;
-                margin-right: -316px;
+                white-space: nowrap;
+            }
+            #infoContainer {
+                position: relative;
             }
             #tetris {
                 border: 1px solid #606060;
@@ -43,12 +47,42 @@
                 padding: 0px;
                 flex: 0 0 auto;
                 border-radius: 1px;
+                display: flex;
+                position: relative;
+            }
+            #playAgain {
+                position: absolute;
+                left: 50%;
+                width: 200px;
+                margin-left: -100px;
+                background: #303030;
+                top: 50%;
+                height: 50px;
+                margin-top: -25px;
+                display: none;
+                align-items: center;
+                justify-content: center;
+                border-radius: 1px;
+                transition: opacity 0.4s ease-out, background 0.2s ease-out;
+                opacity: 0;
+                cursor: pointer;
+                font-family: Open Sans;
+                font-size: 16px;
+                font-weight: 500;
+                text-transform: uppercase;
+            }
+            #playAgain:hover {
+                background: #404040;
+            }
+            #playAgain:active {
+                background: #505050;
             }
         </style>
         <script>
             var _tetris;
         
             function init() {
+                var button = document.getElementById('playAgain');
                 _tetris = new TETRIS.Tetris(document.getElementById('tetris'));
                 _tetris.onScoreChanged = function(score) {
                     document.getElementById('score').innerHTML = score;
@@ -56,6 +90,25 @@
                 _tetris.onLevelChanged = function(level) {
                     document.getElementById('level').innerHTML = level;
                 }
+                _tetris.onLinesChanged = function(lines) {
+                    document.getElementById('lines').innerHTML = lines;
+                }
+                _tetris.onGameOver = function() {
+                    button.style.display = 'flex';
+                    getComputedStyle(button).display;
+                    button.style.opacity = 1;
+                }
+                button.addEventListener('click', function() {
+                    _tetris.reset();
+                    var transitionEnd = function(e) {
+                        if (e.propertyName == 'opacity') {
+                            button.style = 'none';
+                            button.removeEventListener('transitionend', transitionEnd);
+                        }
+                    }
+                    button.addEventListener('transitionend', transitionEnd);
+                    button.style.opacity = 0;
+                });
                 _tetris.reset();
             }
             
@@ -133,6 +186,7 @@
                     // Initialize variables
                     this.level = 1;
                     this.score = 0;
+                    this.lines = 0;
                     this.keyState = {};                    
                     
                     // Do initial callbacks
@@ -141,6 +195,9 @@
                     }
                     if (this.onLevelChanged) {
                         this.onLevelChanged(this.level);
+                    }
+                    if (this.onLinesChanged) {
+                        this.onLinesChanged(this.lines);
                     }
                     
                     // Build walls and floor
@@ -255,6 +312,9 @@
                     var g = this.grid;
                     for (var c = 1; c < this.cols - 1; c++) {
                         if (g[this.top * this.cols + c] > 0) {
+                            if (this.onGameOver) {
+                                this.onGameOver();
+                            }
                             return -1; // Game over
                         }
                     }
@@ -269,6 +329,10 @@
                             }
                         }
                         if (cleared) {
+                            this.lines++;
+                            if (this.onLinesChanged) {
+                                this.onLinesChanged(this.lines);
+                            }
                             clearCount++;
                             for (var c = 1; c < this.cols - 1; c++) {
                                 g[c0 + c] = 0;
@@ -476,10 +540,13 @@
     <body onload='init();'>
         <div id='outerContainer'>
             <div id='container'>
-                <div id='tetris'></div>            
-                <div id='info'>
-                    <div><span>SCORE </span><span id='score'></span></div>
-                    <div><span>LEVEL </span><span id='level'></span></div>
+                <div id='tetris'><div id='playAgain'>Play Again</div></div> 
+                <div id='infoContainer'>
+                    <div id='info'>
+                        <div><span>SCORE </span><span id='score'></span></div>
+                        <div><span>LINES </span><span id='lines'></span></div>
+                        <div><span>LEVEL </span><span id='level'></span></div>
+                    </div>
                 </div>
             </div>
         </div>
